@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package Auth;
+
+option go_package = "";
+
+service Auth{
+    rpc Register(LoginData) returns(AuthData){};
+    rpc Login(LoginData) returns(AuthData){};
+    rpc Refresh(AuthData) returns(AuthData){};
+}
+
+message LoginData{
+    string login = 1;
+    string password = 2;
+}
+
+message AuthData{
+    string access = 1;
+    string refresh = 2;
+    string err = 3;
+}

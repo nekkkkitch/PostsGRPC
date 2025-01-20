@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package Notificator;
+
+option go_package = "";
+
+service Notificator{
+    rpc NotificateUser(User) returns (OK){};
+    rpc DeNotificateUser(User) returns (OK){};
+}
+
+message User{
+    bytes id = 1;
+    bytes connection = 2;
+}
+
+message OK{}

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package Posts;
+
+option go_package = "";
+
+service Posts{
+    rpc AddPost(Post) returns(Status){};
+    rpc ChangePost(Post) returns(Status){};
+    rpc DeletePost(Post) returns(Status){};
+    rpc GetUserPosts(UserPair) returns(PostsPack){};
+    rpc GetFeed(Post) returns(PostsPack){};
+}
+
+message Post{
+    string Title = 1;
+    string Description = 2;
+    bytes Publisher = 3;
+}
+
+message Status{
+    string Err = 1;
+}
+
+message UserPair{
+    bytes User = 1;
+    string Creator = 2;
+}
+
+message PostsPack{
+    bytes Content = 1;
+    string Err = 2;
+}

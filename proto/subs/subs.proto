@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package Subs;
+
+option go_package = "";
+
+service Subs{
+    rpc Subscribe(UserPair) returns(Status){};
+    rpc UnSubscribe(UserPair) returns(Status){};
+    rpc ShowSubscribes(UserPair) returns(Subscribers){};
+    rpc Blacklist(UserPair) returns(Status){};
+    rpc UnBlackList(UserPair) returns(Status){};
+    rpc ShowBlackList(User) returns(BlackList){};
+}
+
+message UserPair{
+    bytes User = 1;
+    string Creator = 2;
+}
+
+message Status{
+    string Err = 1;
+}
+
+message Subscribers{
+    bytes Content = 1;
+    string Err = 2;
+}
+
+message User{
+    bytes user = 1;
+}
+
+message BlackList{
+    bytes Content = 1;
+    string Err = 2;
+}
