@@ -16,6 +16,7 @@ message Post{
     string Title = 1;
     string Description = 2;
     bytes Publisher = 3;
+    bytes PostID = 4;
 }
 
 message Status{
