@@ -8,6 +8,8 @@ service Auth{
     rpc Register(LoginData) returns(AuthData){};
     rpc Login(LoginData) returns(AuthData){};
     rpc Refresh(AuthData) returns(AuthData){};
+    rpc SendEmail(User) returns (Status){};
+    rpc VerifyEmail(UserCode) returns (Status){};
 }
 
 message LoginData{
@@ -19,4 +21,18 @@ message AuthData{
     string access = 1;
     string refresh = 2;
     string err = 3;
+}
+
+message User{
+    bytes id = 1;
+    string email = 2;
+}
+
+message Status{
+    string err = 1;
+}
+
+message UserCode{
+    bytes id = 1;
+    string code = 2;
 }

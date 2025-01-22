@@ -21,6 +21,8 @@ type AuthClient interface {
 	Register(ctx context.Context, in *LoginData, opts ...grpc.CallOption) (*AuthData, error)
 	Login(ctx context.Context, in *LoginData, opts ...grpc.CallOption) (*AuthData, error)
 	Refresh(ctx context.Context, in *AuthData, opts ...grpc.CallOption) (*AuthData, error)
+	SendEmail(ctx context.Context, in *User, opts ...grpc.CallOption) (*Status, error)
+	VerifyEmail(ctx context.Context, in *UserCode, opts ...grpc.CallOption) (*Status, error)
 }
 
 type authClient struct {
@@ -58,6 +60,24 @@ func (c *authClient) Refresh(ctx context.Context, in *AuthData, opts ...grpc.Cal
 	return out, nil
 }
 
+func (c *authClient) SendEmail(ctx context.Context, in *User, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, "/Auth.Auth/SendEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) VerifyEmail(ctx context.Context, in *UserCode, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := c.cc.Invoke(ctx, "/Auth.Auth/VerifyEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
@@ -65,6 +85,8 @@ type AuthServer interface {
 	Register(context.Context, *LoginData) (*AuthData, error)
 	Login(context.Context, *LoginData) (*AuthData, error)
 	Refresh(context.Context, *AuthData) (*AuthData, error)
+	SendEmail(context.Context, *User) (*Status, error)
+	VerifyEmail(context.Context, *UserCode) (*Status, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -80,6 +102,12 @@ func (UnimplementedAuthServer) Login(context.Context, *LoginData) (*AuthData, er
 }
 func (UnimplementedAuthServer) Refresh(context.Context, *AuthData) (*AuthData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Refresh not implemented")
+}
+func (UnimplementedAuthServer) SendEmail(context.Context, *User) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEmail not implemented")
+}
+func (UnimplementedAuthServer) VerifyEmail(context.Context, *UserCode) (*Status, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -148,6 +176,42 @@ func _Auth_Refresh_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_SendEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).SendEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Auth.Auth/SendEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).SendEmail(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserCode)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).VerifyEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Auth.Auth/VerifyEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).VerifyEmail(ctx, req.(*UserCode))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +230,14 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Refresh",
 			Handler:    _Auth_Refresh_Handler,
+		},
+		{
+			MethodName: "SendEmail",
+			Handler:    _Auth_SendEmail_Handler,
+		},
+		{
+			MethodName: "VerifyEmail",
+			Handler:    _Auth_VerifyEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
